@@ -1,0 +1,55 @@
+ext {
+    winswVersion = '2.0.2'
+    winswBuildDir = "${project.buildDir}/windows-service/"
+}
+
+repositories {
+    maven{
+        url 'http://repo.jenkins-ci.org/releases/'
+    }
+}
+
+configurations{
+    winsw { transitive = false }
+}
+
+dependencies {
+    //WinSW
+    winsw "com.sun.winsw:winsw:${winswVersion}:bin@exe"
+}
+
+task winswRepackage(dependsOn: bootRepackage, type: Copy) {
+    from configurations.winsw
+    from "${project.buildDir}/libs/"
+    into "${winswBuildDir}"
+    rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
+    rename "${project.name}-${version}.jar", "${project.name}.jar"
+
+    doFirst{
+        new File("${winswBuildDir}").mkdir()
+    }
+
+    doLast{
+        def configuration = {
+            mkp.xmlDeclaration()
+            configuration() {
+                id("${project.name}")
+                name("${project.name}")
+                executable("java")
+                description([:], "${project.description}-${version}")
+                arguments("-jar \"${project.name}.jar\"")
+                logmode("rotate")
+            }
+        }
+
+        def builder = new groovy.xml.StreamingMarkupBuilder()
+        builder.encoding = "UTF-8"
+        def xml = new File("${winswBuildDir}/${project.name}.xml")
+        xml.write(groovy.xml.XmlUtil.serialize(builder.bind(configuration)))
+    }
+}
+
+configure(winswRepackage) {
+    group = 'winsw'
+    description = 'Spring Boot winsw build'
+}
