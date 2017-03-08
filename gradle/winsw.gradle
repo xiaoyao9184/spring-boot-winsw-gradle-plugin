@@ -26,6 +26,7 @@ task winswRepackage(dependsOn: bootRepackage, type: Copy) {
     into "${winswBuildDir}"
     rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
     rename "${project.name}-${version}.jar", "${project.name}.jar"
+    rename "winsw_${winswLanguage}.bat", "${project.name}.bat"
 
     doFirst{
         new File("${winswBuildDir}").mkdir()

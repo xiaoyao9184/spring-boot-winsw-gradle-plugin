@@ -1,4 +1,4 @@
-ï»¿@echo off
+@echo off
 Setlocal enabledelayedexpansion
 ::CODER BY xiaoyao9184 1.0 beta
 ::TIME 2017-03-08
@@ -10,20 +10,20 @@ Setlocal enabledelayedexpansion
 
 :v
 
-set tip=WINSWå·¥å…·ï¼šå‘½ä»¤å¯¼èˆª
+set tip=WINSW¹¤¾ß£ºÃüÁîµ¼º½
 set ver=1.0
 set winswName=%~n0
 
-set echo_select=è¯·è¾“å…¥åºå·ï¼
-set echo_enter=è¯·è¾“å…¥WinSWç¨‹åºè·¯å¾„
-set echo_auth_good=æœ‰ç®¡ç†å‘˜æƒé™
-set echo_auth_bad=æ— ç®¡ç†å‘˜æƒé™
-set echo_-install=[1]å®‰è£…æœåŠ¡
-set echo_-uninstall=[2]å¸è½½æœåŠ¡
-set echo_-start=[3]å¯åŠ¨æœåŠ¡
-set echo_-stop=[4]åœæ­¢æœåŠ¡
-set echo_-restart=[5]é‡å¯æœåŠ¡
-set echo_-status=[6]æœåŠ¡çŠ¶æ€
+set echo_select=ÇëÊäÈëĞòºÅ£¡
+set echo_enter=ÇëÊäÈëWinSW³ÌĞòÂ·¾¶
+set echo_auth_good=ÓĞ¹ÜÀíÔ±È¨ÏŞ
+set echo_auth_bad=ÎŞ¹ÜÀíÔ±È¨ÏŞ
+set echo_-install=[1]°²×°·şÎñ
+set echo_-uninstall=[2]Ğ¶ÔØ·şÎñ
+set echo_-start=[3]Æô¶¯·şÎñ
+set echo_-stop=[4]Í£Ö¹·şÎñ
+set echo_-restart=[5]ÖØÆô·şÎñ
+set echo_-status=[6]·şÎñ×´Ì¬
 
 
 
@@ -32,8 +32,8 @@ set echo_-status=[6]æœåŠ¡çŠ¶æ€
 
 title %tip% %ver%
 
-echo WINSWå·¥å…·ï¼šå‘½ä»¤å¯¼èˆª
-echo è¿è¡Œç»“æŸåå¯ä»¥å…³é—­
+echo WINSW¹¤¾ß£ºÃüÁîµ¼º½
+echo ÔËĞĞ½áÊøºó¿ÉÒÔ¹Ø±Õ
 echo ...
 
 
