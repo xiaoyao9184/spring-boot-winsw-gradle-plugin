@@ -1,6 +1,7 @@
 ext {
     winswVersion = '2.0.2'
     winswBuildDir = "${project.buildDir}/windows-service/"
+    winswLanguage = 'zh_CN'
 }
 
 repositories {
@@ -21,6 +22,7 @@ dependencies {
 task winswRepackage(dependsOn: bootRepackage, type: Copy) {
     from configurations.winsw
     from "${project.buildDir}/libs/"
+    from "${rootProject.rootDir}/gradle/batch/winsw_${winswLanguage}.bat"
     into "${winswBuildDir}"
     rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
     rename "${project.name}-${version}.jar", "${project.name}.jar"
