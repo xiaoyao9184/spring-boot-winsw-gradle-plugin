@@ -2,6 +2,7 @@ ext {
     winswVersion = '2.0.2'
     winswBuildDir = "${project.buildDir}/windows-service/"
     winswLanguage = 'zh_CN'
+    winswProfile = project.hasProperty("profile") ? profile : "prod"
 }
 
 repositories {
@@ -20,16 +21,20 @@ dependencies {
 }
 
 task winswRepackage(dependsOn: bootRepackage, type: Copy) {
+    def outPath = project.hasProperty("winswProfile") ?
+            "${winswBuildDir}/${winswProfile}" :
+            "${winswBuildDir}"
+
     from configurations.winsw
     from "${project.buildDir}/libs/"
     from "${rootProject.rootDir}/gradle/batch/winsw_${winswLanguage}.bat"
-    into "${winswBuildDir}"
+    into "${outPath}"
     rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
     rename "${project.name}-${version}.jar", "${project.name}.jar"
     rename "winsw_${winswLanguage}.bat", "${project.name}.bat"
 
     doFirst{
-        new File("${winswBuildDir}").mkdir()
+        new File("${outPath}").mkdir()
     }
 
     doLast{
@@ -40,14 +45,18 @@ task winswRepackage(dependsOn: bootRepackage, type: Copy) {
                 name("${project.name}")
                 executable("java")
                 description([:], "${project.description}-${version}")
-                arguments("-jar \"${project.name}.jar\"")
+                arguments(
+                        (project.hasProperty("winswProfile") ?
+                                "-Dspring.profiles.active=${winswProfile} " :
+                                "") +
+                        "-jar \"${project.name}.jar\"")
                 logmode("rotate")
             }
         }
 
         def builder = new groovy.xml.StreamingMarkupBuilder()
         builder.encoding = "UTF-8"
-        def xml = new File("${winswBuildDir}/${project.name}.xml")
+        def xml = new File("${outPath}/${project.name}.xml")
         xml.write(groovy.xml.XmlUtil.serialize(builder.bind(configuration)))
     }
 }
