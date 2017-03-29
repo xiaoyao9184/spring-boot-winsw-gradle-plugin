@@ -26,15 +26,21 @@ task winswRepackage(dependsOn: bootRepackage, type: Copy) {
             "${winswBuildDir}"
 
     from configurations.winsw
-    from "${project.buildDir}/libs/"
     from "${rootProject.rootDir}/gradle/batch/winsw_${winswLanguage}.bat"
+    from "${project.buildDir}/libs/"
     into "${outPath}"
     rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
-    rename "${project.name}-${version}.jar", "${project.name}.jar"
     rename "winsw_${winswLanguage}.bat", "${project.name}.bat"
+    rename "${project.name}-${version}.jar", "${project.name}.jar"
 
     doFirst{
         new File("${outPath}").mkdir()
+        def batFile = new File("${rootProject.rootDir}/gradle/batch/winsw_${winswLanguage}.bat")
+        if (!batFile.exists()) {
+            batFile.getParentFile().mkdirs()
+            new URL('https://raw.githubusercontent.com/xiaoyao9184/spring-boot-winsw-gradle-plugin/master/gradle/batch/winsw_zh_CN.bat')
+                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
+        }
     }
 
     doLast{
