@@ -20,8 +20,9 @@ $Script = {
     cd $workPath
 
     #Install
-    $service = Get-Service $jarService
-    if(!$service){
+    $service = Get-Service $jarService -ErrorAction SilentlyContinue
+    if (!$service)
+    {
         Write-Host "Service needs to be installed!"
         $winswExeCommand = $workPath + "\" + $jarService + ".exe install"
         Invoke-Expression -Command:$winswExeCommand
@@ -37,7 +38,7 @@ $Script = {
     
     #Replace
     if(Test-Path .\temp\){
-        $tempFiles = Get-ChildItem .\temp\
+        $tempFiles = Get-ChildItem .\temp\ | Measure-Object
         if($tempFiles.Count -gt 0){
             Move-Item -path .\temp\* -destination .\ -force
         }
@@ -49,6 +50,10 @@ $Script = {
 
 }
 
+#ISE DEBUG
+if ($host.name -match 'ISE'){
+    Invoke-Command -Scriptblock $Script -ArgumentList $RemoteWorkPath,$RemoteJarService
+}
 
 #Print
 Write-Host "Username:" $Username "Password:" $Password "ComputerName:" $ComputerName
