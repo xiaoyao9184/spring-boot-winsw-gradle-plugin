@@ -3,6 +3,13 @@ ext {
     winswBuildDir = "${project.buildDir}/windows-service/"
     winswLanguage = 'zh_CN'
     winswProfile = project.hasProperty("profile") ? profile : "prod"
+    bootPackage = project.tasks.findByName('bootRepackage') ? 'bootRepackage' :
+            project.tasks.findByName('bootJar') ? 'bootJar' :
+            null
+    if(bootPackage == null){
+        throw new UnsupportedOperationException("Only support spring boot with jar package mode! \n" +
+                "This means must include 'bootRepackage' or 'bootJar' task in project " + project.name)
+    }
 }
 
 repositories {
@@ -20,7 +27,7 @@ dependencies {
     winsw "com.sun.winsw:winsw:${winswVersion}:bin@exe"
 }
 
-task winswRepackage(dependsOn: bootRepackage, type: Copy) {
+task winswRepackage(dependsOn: ${bootPackage}, type: Copy) {
     def outPath = project.hasProperty("winswProfile") ?
             "${winswBuildDir}/${winswProfile}" :
             "${winswBuildDir}"
