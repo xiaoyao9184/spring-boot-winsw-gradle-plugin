@@ -59,13 +59,13 @@ task winswRepackage(dependsOn: ${bootPackage}, type: Copy) {
                 executable("java")
                 description([:], "${project.description}-${version}")
                 arguments(
-                        "-jar \"${project.name}.jar\"" +
+                        (project.hasProperty("argLine") ?
+                                " ${argLine}" :
+                                "") +
                         (project.hasProperty("winswProfile") ?
                                 " -Dspring.profiles.active=${winswProfile}" :
                                 "") +
-                        (project.hasProperty("argLine") ?
-                                " ${argLine}" :
-                                "")
+                        " -jar \"${project.name}.jar\"" +
                         )
                 logmode("rotate")
             }
