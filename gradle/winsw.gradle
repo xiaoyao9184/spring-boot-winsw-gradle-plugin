@@ -65,7 +65,7 @@ task winswRepackage(dependsOn: ${bootPackage}, type: Copy) {
                         (project.hasProperty("winswProfile") ?
                                 " -Dspring.profiles.active=${winswProfile}" :
                                 "") +
-                        " -jar \"${project.name}.jar\"" +
+                        " -jar \"${project.name}.jar\""
                         )
                 logmode("rotate")
             }
