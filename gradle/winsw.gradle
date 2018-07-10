@@ -27,7 +27,7 @@ dependencies {
     winsw "com.sun.winsw:winsw:${winswVersion}:bin@exe"
 }
 
-task winswRepackage(dependsOn: ${bootPackage}, type: Copy) {
+task winswRepackage(dependsOn: "${bootPackage}", type: Copy) {
     def outPath = project.hasProperty("winswProfile") ?
             "${winswBuildDir}/${winswProfile}" :
             "${winswBuildDir}"
