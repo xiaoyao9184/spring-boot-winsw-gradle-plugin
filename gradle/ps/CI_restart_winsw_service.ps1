@@ -1,4 +1,10 @@
-﻿Write-Host "Host in:" $host.name
+﻿Write-Host ====================
+Write-Host CODER BY xiaoyao9184
+Write-Host TIME 2018-08-02 1.0 beta
+Write-Host FILE CI_restart_winsw_service
+Write-Host DESC replace and restart winsw service
+Write-Host Host in $host.name
+Write-Host ====================
 
 #Default variable
 $RemoteDeployPath = "D:\Test\boot\"
@@ -44,6 +50,8 @@ $Script = {
     #Into
     Write-Host "Navigate to work directory" $workPath
     Set-Location -LiteralPath $workPath
+    $workPath = Get-Location
+    $workPath = $workPath.toString()
 
     #Check need replace
     $replaceFlag = $false
@@ -72,7 +80,8 @@ $Script = {
             Write-Host "Service needs to be stopped!"
             #Stop-Service $jarService
             $service.Stop();
-            Start-Sleep -Seconds 5
+            #Start-Sleep -Seconds 5
+            $service.WaitForStatus('Stopped')
             Write-Host "Service stop completed!"
             $service = getService($jarService)
         }
@@ -80,9 +89,10 @@ $Script = {
         #Replace
         Write-Host "Replacing file!"
         foreach($f in $replaceFiles){
-            Move-Item -LiteralPath $f.FullName -Destination $workPath\$f -force
+            $target = $workPath + "\" + $f.Name
+            Move-Item -LiteralPath $f.FullName -Destination $target -Force
         }
-        Remove-Item .\temp\ -ErrorAction "Stop"
+        Remove-Item .\temp\ -Recurse -ErrorAction "Stop"
         Write-Host "Replace completed!"
     }
 
@@ -120,9 +130,10 @@ $Script = {
         return
     }else{
         Write-Host "Service need to be start!"
-        #Start-Service $jarService
+        #Start-Service $jarService  
         $service.Start();
-        Start-Sleep -Seconds 2
+        #Start-Sleep -Seconds 2
+        $service.WaitForStatus('Running')
         Write-Host "Service start completed!"
     }
 }
@@ -148,6 +159,9 @@ if ($host.name -match 'ISE'){
     return
 }
 
+Write-Host "Create session for remote computer and invoke script"
+Write-Host --------------------------------------------------
+
 #Create credential object
 $SecurePassWord = ConvertTo-SecureString -AsPlainText $Password -Force
 $Cred = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $Username, $SecurePassWord
@@ -157,6 +171,9 @@ $Session = New-PSSession -ComputerName $ComputerName -credential $Cred
 
 #Invoke-Command
 Invoke-Command -Session $Session -Scriptblock $Script -ArgumentList $RemoteWorkPath,$RemoteJarService,$RemoteWinswName
+
+Write-Host --------------------------------------------------
+Write-Host "Delete session for remote computer"
 
 #Close Session
 Remove-PSSession -Session $Session
