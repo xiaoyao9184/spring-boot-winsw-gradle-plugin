@@ -119,7 +119,8 @@ $Script = {
                 Write-Host "Service needs to be uninstalled!"
                 $winswExeCommand = "& " + $winswFile + " uninstall"
                 Write-Host $winswExeCommand
-                Invoke-Expression -Command $winswExeCommand
+                $result = Invoke-Expression -Command $winswExeCommand
+                Write-Host $result
                 if($lastexitcode -eq 0){
                     Write-Host "Service uninstall completed!"
                     $service = getService($serviceName)
@@ -146,7 +147,8 @@ $Script = {
                 #$winswExeCommand = $winswFile ".exe"
                 Write-Host $winswExeCommand
                 #Start-Process $winswExeCommand -ArgumentList "install" -wait -NoNewWindow
-                Invoke-Expression -Command $winswExeCommand
+                $result = Invoke-Expression -Command $winswExeCommand
+                Write-Host $result
                 if($lastexitcode -eq 0){
                     Write-Host "Service install completed!"
                     $service = getService($serviceName)
