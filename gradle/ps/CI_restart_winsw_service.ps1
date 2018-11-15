@@ -6,6 +6,7 @@ Write-Host DESC replace and restart winsw service
 Write-Host Host in $host.Name
 Write-Host ====================
 Write-Host Change 2018-11-13 Support exit code
+Write-Host Change 2018-11-15 Support uninstall wrong location service
 Write-Host ====================
 
 #Default variable
@@ -59,6 +60,17 @@ $Script = {
         $workPath = Get-Location
         $workPath = $workPath.toString()
 
+        #Service
+        $service = getService($serviceName)
+        $winswFile = $workPath + "/" + $winswName + ".exe"
+
+        #Check need reinstall
+        $reinstallFlag = $false
+        if($service -and -not (Test-Path -LiteralPath $winswFile)){
+            Write-Host "Reinstall service beacuse old service not in this" $workPath/ "directory !"
+            $reinstallFlag = $true
+        }
+
         #Check need replace
         $replaceFlag = $false
         if(Test-Path ./temp/){
@@ -75,8 +87,6 @@ $Script = {
             Write-Host "Replace no need!"
         }
 
-        #Service
-        $service = getService($serviceName)
         
         #Replace
         #when service is reunning need to stop for replace
@@ -102,13 +112,38 @@ $Script = {
             Write-Host "Replace completed!"
         }
 
+        #Uninstall
+        #when service is in other work path
+        if($reinstallFlag){
+            if(Test-Path -LiteralPath $winswFile){
+                Write-Host "Service needs to be uninstalled!"
+                $winswExeCommand = "& " + $winswFile + " uninstall"
+                Write-Host $winswExeCommand
+                Invoke-Expression -Command $winswExeCommand
+                if($lastexitcode -eq 0){
+                    Write-Host "Service uninstall completed!"
+                    $service = getService($serviceName)
+                    #Check uninstall again
+                    if ($service){
+                        Write-Host -ForegroundColor Red "Error find service exist" $serviceName "!"
+                        return 1
+                    }
+                }else{
+                    throw "Service uninstall failed!"
+                    return 1
+                }
+            }else{
+                Write-Host -ForegroundColor Red "Error no winsw exe file" $winswFile "to be uninstall!"
+                return 1
+            }
+        }
+
         #Check need install
         if (!$service){
-            $exeService = $workPath + "/" + $winswName + ".exe"
-            if(Test-Path -LiteralPath $exeService){
+            if(Test-Path -LiteralPath $winswFile){
                 Write-Host "Service needs to be installed!"
-                $winswExeCommand = "& " + $workPath + "/" + $winswName + ".exe install"
-                #$winswExeCommand = $workPath + "/" + $winswName + ".exe"
+                $winswExeCommand = "& " + $winswFile + " install"
+                #$winswExeCommand = $winswFile ".exe"
                 Write-Host $winswExeCommand
                 #Start-Process $winswExeCommand -ArgumentList "install" -wait -NoNewWindow
                 Invoke-Expression -Command $winswExeCommand
@@ -125,7 +160,7 @@ $Script = {
                     return 1
                 }
             }else{
-                Write-Host -ForegroundColor Red "Error no winsw exe file" $exeService "to be install!"
+                Write-Host -ForegroundColor Red "Error no winsw exe file" $winswFile "to be install!"
                 return 1
             }
         }
