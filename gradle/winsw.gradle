@@ -1,5 +1,6 @@
 ext {
-    winswVersion = '2.0.2'
+    netVersion = 'net4'
+    winswVersion = '2.2.0'
     winswBuildDir = "${project.buildDir}/windows-service/"
     winswLanguage = 'zh_CN'
     winswProfile = project.hasProperty("profile") ? profile : "prod"
@@ -24,8 +25,10 @@ configurations{
 
 dependencies {
     //WinSW
-    winsw "com.sun.winsw:winsw:${winswVersion}:bin@exe"
+    winsw "com.sun.winsw:winsw:${winswVersion}:${netVersion}@exe"
 }
+
+
 
 task winswRepackage(dependsOn: "${bootPackage}", type: Copy) {
     def outPath = project.hasProperty("winswProfile") ?
@@ -36,7 +39,7 @@ task winswRepackage(dependsOn: "${bootPackage}", type: Copy) {
     from "${rootProject.rootDir}/gradle/batch/winsw_${winswLanguage}.bat"
     from "${project.buildDir}/libs/"
     into "${outPath}"
-    rename "winsw-${winswVersion}-bin.exe", "${project.name}.exe"
+    rename "winsw-${winswVersion}-${netVersion}.exe", "${project.name}.exe"
     rename "winsw_${winswLanguage}.bat", "${project.name}.bat"
     rename "${project.name}-${version}.jar", "${project.name}.jar"
 
@@ -59,14 +62,10 @@ task winswRepackage(dependsOn: "${bootPackage}", type: Copy) {
                 executable("java")
                 description([:], "${project.description}-${version}")
                 arguments(
-                        (project.hasProperty("argLine") ?
-                                " ${argLine}" :
-                                "") +
                         (project.hasProperty("winswProfile") ?
-                                " -Dspring.profiles.active=${winswProfile}" :
+                                "-Dspring.profiles.active=${winswProfile} " :
                                 "") +
-                        " -jar \"${project.name}.jar\""
-                        )
+                        "-jar \"${project.name}.jar\"")
                 logmode("rotate")
             }
         }
